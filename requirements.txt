@@ -1,0 +1,10 @@
+async-tkinter-loop==0.9.3
+certifi==2024.2.2
+charset-normalizer==3.3.2
+idna==3.7
+pyglet==2.0.15
+python-dotenv==1.0.1
+pytz==2024.1
+requests==2.32.2
+typing_extensions==4.12.0
+urllib3==2.2.1  
