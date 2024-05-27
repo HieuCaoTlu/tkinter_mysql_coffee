@@ -1,5 +1,9 @@
 from pathlib import Path
 from tkinter import *
+from tkinter import filedialog
+from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
+import pandas as pd
 from controller.kpi_ctl import change_kpi, add_kpi
 import asyncio
 from async_tkinter_loop import async_handler
@@ -40,6 +44,7 @@ class AllInfo(Frame):
             "btn-small": PhotoImage(file=relative_to_assets("image_2.png")),
             "btn-normal": PhotoImage(file=relative_to_assets("image_3.png")),
             "confirm": PhotoImage(file=relative_to_assets("button_4.png")),
+            "report": PhotoImage(file=relative_to_assets("report.png")),
         }
 
         canvas.place(x=0, y=0)
@@ -109,6 +114,17 @@ class AllInfo(Frame):
         canvas.create_image(183.0, 221.0, image=self.assets["btn"])
         canvas.create_image(452.0, 221.0, image=self.assets["btn-small"])
         canvas.create_image(687.0, 221.0, image=self.assets["btn-normal"])
+        report = Button(
+            self,
+            image=self.assets["report"],
+            borderwidth=0,
+            highlightthickness=0,
+            command=self.choiceReport,
+            background="#f6f6f6",
+            activebackground="#f6f6f6",
+            relief="flat",
+        )
+        report.place(x=355, y=362.0, width=280.0, height=141.0)
         canvas.create_text(
             599.0,
             173.0,
@@ -212,14 +228,14 @@ class AllInfo(Frame):
             command=self.change,
             compound="center",
             text="Đổi",
-            font=("Inter SemiBold",13),
-            foreground="white"
+            font=("Inter SemiBold", 13),
+            foreground="white",
         )
         self.confirm_btn.place(x=713.0, y=100.0, width=82.0, height=40.0)
 
     def change(self):
         if not self.context.currentUser.position:
-            alert_message('Nhân viên không được sử dụng tính năng này!')
+            alert_message("Nhân viên không được sử dụng tính năng này!")
             return
         self.discount_btn.config(state="normal")
         self.tax_btn.config(state="normal")
@@ -244,9 +260,9 @@ class AllInfo(Frame):
                 self.context.currentKPI.month = int(now.month)
                 self.context.currentKPI.edit = 0
                 self.kpi.set(self.context.currentKPI.value)
-                success_message('Tạo KPI thành công!')
+                success_message("Tạo KPI thành công!")
             else:
-                alert_message('Tạo KPI thất bại!')
+                alert_message("Tạo KPI thất bại!")
         else:
             if int(self.kpi.get()) != self.context.currentKPI.value:
                 if self.context.currentKPI.edit < 3:
@@ -256,9 +272,9 @@ class AllInfo(Frame):
                     if results:
                         self.context.currentKPI.edit += 1
                         self.kpi.set(self.context.currentKPI.value)
-                        success_message('Đổi KPI thành công!')
+                        success_message("Đổi KPI thành công!")
                 else:
-                    alert_message('Bạn chỉ được đổi KPI 3 lần trong 1 tháng')
+                    alert_message("Bạn chỉ được đổi KPI 3 lần trong 1 tháng")
             else:
                 pass
         # tax
@@ -273,14 +289,109 @@ class AllInfo(Frame):
             self.context.currentDiscount = int(self.discount.get()[:-1])
 
         if change:
-            task2 = asyncio.create_task(change_other(self.context.currentTax, self.context.currentDiscount))
+            task2 = asyncio.create_task(
+                change_other(self.context.currentTax, self.context.currentDiscount)
+            )
             results = await task2
             if not results:
-                alert_message('Đổi không thành công!')
+                alert_message("Đổi không thành công!")
             else:
-                success_message('Đổi thuế và khuyến mại thành công!')
+                success_message("Đổi thuế và khuyến mại thành công!")
 
         self.confirm_btn.config(command=self.change)
-            
 
+    def chooseDst(self):
+            selected_month_year = self.month_year_var.get().split('-')
+            month = int(selected_month_year[0])
+            year = int(selected_month_year[1])
+            filepath = filedialog.asksaveasfilename(defaultextension=".xlsx",
+                                                filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")])
+            if filepath:
+                self.create_report(filepath, month, year)
+            self.top.destroy()
 
+    def choiceReport(self):
+        if not self.context.currentUser.position:
+            alert_message('Bạn không được phép in báo cáo')
+            return
+        self.Reportdata = self.context.currentInvoice.copy()
+        for each in self.Reportdata:
+            if not isinstance(each.created_at, datetime):
+                each.created_at = datetime.strptime(each.created_at, '%Y-%m-%d %H:%M:%S')
+            each.quantity = 0
+            each.describe = ''
+            for each2 in self.context.currentInvoiceDrink.copy():
+                if each2.invoice == each.id:
+                    each.quantity += each2.quantity
+                    each.describe += f"[{each2.quantity} - {each2.drink_name} - {each2.price}], "
+        self.top = Toplevel(self)
+        self.top.geometry("1000x600")
+        self.top.resizable(False, False)
+        self.top.title("In báo cáo")
+        self.top.geometry("250x150")
+        month_years = sorted({f"{invoice.created_at.month}-{invoice.created_at.year}" for invoice in self.Reportdata})
+        Label(self.top, text="Chọn tháng và năm:",font=("Inter ",12)).pack(pady=5)
+        self.month_year_var = StringVar(self.top)
+        self.month_year_var.set(month_years[0])
+        OptionMenu(self.top, self.month_year_var, *month_years).pack(pady=5)
+        Button(self.top, text="Xác nhận", command=self.chooseDst,font=("Inter ",10)).pack(pady=10)
+        
+    def create_report(self, filepath, report_month, report_year):
+        filtered_invoices = [
+            invoice for invoice in self.Reportdata
+            if invoice.created_at.month == report_month and invoice.created_at.year == report_year
+        ]
+
+        if not filtered_invoices:
+            alert_message("Không có hóa đơn nào trong tháng được chọn.")
+            return
+
+        data = [
+            {
+                'ID': invoice.id,
+                'Tên nhân viên': invoice.employee_name,
+                'Ngày tạo': invoice.created_at,
+                'Số lượng': invoice.quantity,
+                'Tạm tính': invoice.amount,
+                'Thuế': invoice.tax,
+                'Giảm giá': invoice.discount,
+                'Mô tả': invoice.describe,
+                'Tổng': invoice.total,
+            }
+            for index, invoice in enumerate(filtered_invoices, start=1)
+        ]
+
+        for i, d in enumerate(data):
+            d['STT'] = i + 1
+
+        columns_order = ['STT', 'ID', 'Ngày tạo', 'Tên nhân viên', 'Số lượng', 'Mô tả', 'Tạm tính', 'Thuế', 'Giảm giá', 'Tổng']
+        df = pd.DataFrame(data, columns=columns_order)
+
+        if 'Tổng' in df.columns:
+            total_revenue = int(df['Tổng'].sum())
+
+            with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
+                df.to_excel(writer, startrow=4, index=False, sheet_name='Invoices')
+
+                workbook = writer.book
+                sheet = writer.sheets['Invoices']
+
+                sheet['A1'] = f'Báo cáo tháng {report_month}/{report_year}'
+                sheet['A1'].font = Font(size=14, bold=True, name='Times New Roman')
+                sheet['A2'] = f'Người in báo cáo:{self.context.currentUser.name}'
+                sheet['A2'].font = Font(name='Times New Roman')
+                sheet['A3'] = f'Tổng doanh thu: {total_revenue}'
+                sheet['A3'].font = Font(name='Times New Roman')
+
+                fixed_width = 50  
+                for col_num, column_title in enumerate(df.columns, 1):
+                    col_letter = get_column_letter(col_num)
+                    if column_title == "Mô tả":
+                        sheet.column_dimensions[col_letter].width = fixed_width
+                    else:
+                        max_length = max(df[column_title].astype(str).map(len).max(), len(column_title)) + 2
+                        sheet.column_dimensions[col_letter].width = max_length
+
+            success_message(f"Báo cáo đã được lưu tại '{filepath}'")
+        else:
+           alert_message("Không tìm thấy cột 'Tổng' trong DataFrame.")
