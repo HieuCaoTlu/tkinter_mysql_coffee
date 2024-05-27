@@ -413,7 +413,7 @@ class Scrolling(Frame):
         self.parent.invoice_amount.set(f"{int(item.amount)}")
         self.parent.invoice_tax.set(f"{int(item.tax)}%")
         self.parent.invoice_discount.set(f"{int(item.discount)}%")
-        self.parent.invoice_total.set(f"{int(item.amount)}")
+        self.parent.invoice_total.set(f"{int(item.total)}")
         button.config(image=self.assets["choose_invoice"])
         button.config(fg="white")
         self.parent.detail.create_buttons()
