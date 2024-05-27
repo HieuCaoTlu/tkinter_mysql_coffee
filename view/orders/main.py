@@ -16,7 +16,7 @@ class Orders(Frame):
 
     def change_section(self, name):
         if name == "orders":
-            self.sections["orders"].update_items()
+            self.sections["orders"] = AllOrders(self)
         for section in self.sections.values():
             section.place_forget()
         self.sections[name].place(x=0, y=0, width=1000, height=600)

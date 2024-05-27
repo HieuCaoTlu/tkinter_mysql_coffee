@@ -18,7 +18,7 @@ class Drinks(Frame):
         if name == "drink_info":
             self.sections["drink_info"] = DrinkInfo(self, drink)
         elif name == "drinks":
-            self.sections["drinks"].update_items()
+            self.sections["drinks"] = AllDrinks(self)
         for section in self.sections.values():
             section.place_forget()
         self.sections[name].place(x=0, y=0, width=1000, height=600)
