@@ -251,9 +251,9 @@ class Home(Frame):
             if drink.id == mostdrink:
                 self.most_common_drink = drink.name
                 break
-        self.kpi_progress = (
+        self.kpi_progress = round((
             self.month_revenue_count / (self.context.currentKPI.value)
-        ) * 100
+        ) * 100, 2) 
         self.kpi_full = Button(
             self,
             state="disabled",

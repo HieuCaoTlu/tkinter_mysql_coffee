@@ -273,11 +273,10 @@ class AllOrders(Frame):
                 item.created_at_dt = datetime.strptime(item.created_at, '%Y-%m-%d %H:%M:%S').astimezone(vn_tz)
 
         now = datetime.now(vn_tz)
-        
         if category != 'Tất cả':
             if category == 'Hôm nay':
                 start_of_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
-                filtered_items = [item for item in filtered_items if start_of_today <= item.created_at_dt < start_of_today + timedelta(days=1)]
+                filtered_items = [item for item in filtered_items if item.created_at_dt.date() == start_of_today.date()]
             elif category == 'Tuần này':
                 start_of_week = now - timedelta(days=now.weekday())
                 start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
