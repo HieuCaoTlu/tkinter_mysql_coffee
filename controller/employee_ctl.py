@@ -12,7 +12,7 @@ auth = HTTPBasicAuth(os.getenv("ADM"), os.getenv("APASS"))
 
 async def employees():
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/employees"
+        url = f"{os.getenv('API')}/employees"
         response = requests.get(url, headers=headers, auth=auth)
         if response.status_code == 200:
             raw = response.json()["data"]["rows"]
@@ -39,7 +39,7 @@ async def employees():
 
 async def get_employee(id=None):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/employee"
+        url = f"{os.getenv('API')}/employee"
         response = requests.get(url, headers=headers, auth=auth, params={"id": id})
         if response.status_code == 200:
             raw = response.json()["data"]["rows"]
@@ -65,7 +65,7 @@ async def get_employee(id=None):
 
 async def delete_employee(id=None):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/employee"
+        url = f"{os.getenv('API')}/employee"
         response = requests.delete(url, headers=headers, auth=auth, params={"id": id})
         if response.status_code == 200:
             return True
@@ -77,7 +77,7 @@ async def delete_employee(id=None):
 
 async def change_employee(employee):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/employee"
+        url = f"{os.getenv('API')}/employee"
         response = requests.put(
             url,
             headers=headers,
@@ -102,7 +102,7 @@ async def change_employee(employee):
 
 async def add_employee(employee):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/employee"
+        url = f"{os.getenv('API')}/employee"
         response = requests.post(
             url,
             headers=headers,

@@ -11,7 +11,7 @@ auth = HTTPBasicAuth(os.getenv("ADM"), os.getenv("APASS"))
 
 async def get_other():
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/other"
+        url = f"{os.getenv('API')}/other"
         response = requests.get(url, headers=headers, auth=auth)
         if response.status_code == 200:
             raw = response.json()["data"]["rows"]
@@ -28,7 +28,7 @@ async def get_other():
 
 async def change_other(tax, discount):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/other"
+        url = f"{os.getenv('API')}/other"
         response = requests.put(
             url,
             headers=headers,

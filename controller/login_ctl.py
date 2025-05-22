@@ -7,7 +7,7 @@ load_dotenv()
 
 async def login(user,psw):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/login"
+        url = f"{os.getenv('API')}/login"
         headers = {"accept": "application/json"}
         auth = HTTPBasicAuth(os.getenv('ADM'),os.getenv('APASS'))
         response = requests.get(url, headers=headers, auth=auth, params={'username':user,'psw':psw})

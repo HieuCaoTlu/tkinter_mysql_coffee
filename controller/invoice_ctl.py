@@ -11,7 +11,7 @@ auth = HTTPBasicAuth(os.getenv("ADM"), os.getenv("APASS"))
 
 async def invoices():
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/invoices"
+        url = f"{os.getenv('API')}/invoices"
         response = requests.get(url, headers=headers, auth=auth)
         if response.status_code == 200:
             raw = response.json()["data"]["rows"]
@@ -38,7 +38,7 @@ async def invoices():
 
 async def get_invoice_drink(id=None):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/invoice_drink"
+        url = f"{os.getenv('API')}/invoice_drink"
         response = requests.get(url, headers=headers, auth=auth, params={"id": id})
         if response.status_code == 200:
             raw = response.json()["data"]["rows"]
@@ -63,7 +63,7 @@ async def get_invoice_drink(id=None):
 
 async def add_invoice(invoice, list):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/invoice"
+        url = f"{os.getenv('API')}/invoice"
         response = requests.post(
             url,
             headers=headers,
@@ -80,7 +80,7 @@ async def add_invoice(invoice, list):
             raw = response.json()["data"]["rows"][0]
             invoice.id = int(raw["id"])
             invoice.created_at = raw["created_at"]
-            url2 = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/invoice_drink"
+            url2 = f"{os.getenv('API')}/invoice_drink"
             count = 0
             for each in list:
                 rsp = requests.post(

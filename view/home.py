@@ -245,14 +245,22 @@ class Home(Frame):
         for invoice in self.context.currentInvoiceDrink:
             drink = invoice.drink
             drink_count[drink] = drink_count.get(drink, 0) + invoice.quantity
-        mostdrink = max(drink_count, key=drink_count.get)
+        if drink_count:
+            mostdrink = max(drink_count, key=drink_count.get)
+        else:
+            mostdrink = None
         self.most_common_drink = ""
         for drink in self.context.currentDrink:
             if drink.id == mostdrink:
                 self.most_common_drink = drink.name
                 break
+        kpi_value = self.context.currentKPI.value
+        if kpi_value != 0:
+            result = self.month_revenue_count / kpi_value
+        else:
+            result = 0
         self.kpi_progress = round((
-            self.month_revenue_count / (self.context.currentKPI.value)
+            result
         ) * 100, 2) 
         self.kpi_full = Button(
             self,

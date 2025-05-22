@@ -12,7 +12,7 @@ auth = HTTPBasicAuth(os.getenv("ADM"), os.getenv("APASS"))
 
 async def get_kpi():
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/kpi"
+        url = f"{os.getenv('API')}/kpi"
         response = requests.get(url, headers=headers, auth=auth)
         if response.status_code == 200:
             raw = response.json()["data"]["rows"]
@@ -34,7 +34,7 @@ async def get_kpi():
 
 async def change_kpi(kpi):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/kpi"
+        url = f"{os.getenv('API')}/kpi"
         response = requests.put(
             url,
             headers=headers,
@@ -53,7 +53,7 @@ async def change_kpi(kpi):
 
 async def add_kpi(kpi):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/kpi"
+        url = f"{os.getenv('API')}/kpi"
         response = requests.post(
             url,
             headers=headers,

@@ -12,7 +12,7 @@ auth = HTTPBasicAuth(os.getenv("ADM"), os.getenv("APASS"))
 
 async def drinks():
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/drinks"
+        url = f"{os.getenv('API')}/drinks"
         response = requests.get(url, headers=headers, auth=auth)
         if response.status_code == 200:
             raw = response.json()["data"]["rows"]
@@ -30,7 +30,7 @@ async def drinks():
 
 async def get_drink(id=None):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/drink"
+        url = f"{os.getenv('API')}/drink"
         response = requests.get(url, headers=headers, auth=auth, params={"id": id})
         if response.status_code == 200:
             raw = response.json()["data"]["rows"]
@@ -47,7 +47,7 @@ async def get_drink(id=None):
 
 async def delete_drink(id=None):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/drink"
+        url = f"{os.getenv('API')}/drink"
         response = requests.delete(url, headers=headers, auth=auth, params={"id": id})
         if response.status_code == 200:
             return True
@@ -59,7 +59,7 @@ async def delete_drink(id=None):
 
 async def change_drink(drink):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/drink"
+        url = f"{os.getenv('API')}/drink"
         response = requests.put(
             url,
             headers=headers,
@@ -81,7 +81,7 @@ async def change_drink(drink):
 
 async def add_drink(drink):
     try:
-        url = "https://ap-southeast-1.data.tidbcloud.com/api/v1beta/app/dataapp-OiUZnSiQ/endpoint/drink"
+        url = f"{os.getenv('API')}/drink"
         response = requests.post(
             url,
             headers=headers,
